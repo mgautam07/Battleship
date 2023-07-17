@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startMultiPlayer(){
     const blocks = document.querySelectorAll('#computer div')
-    console.log()
     for(let i=0; i<100; i++)
     {
       blocks[i].addEventListener('click', () => {
@@ -358,6 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const notTaken = playerShipBlocks.every(shipBlock => !shipBlock.classList.contains('taken'))
     if(valid && notTaken){
       playerShipBlocks.forEach((shipBlock, index) => {
+        if(shipBlock.classList.contains("vertical")) shipBlock.classList.remove("vertical")
+        if(shipBlock.classList.contains("horizontal")) shipBlock.classList.remove("horizontal")
+        if(shipBlock.classList.contains("start")) shipBlock.classList.remove("start")
+        if(shipBlock.classList.contains("end")) shipBlock.classList.remove("end")
         let directionClass = "undefined"
         if(index === 0) directionClass = "start"
         if(index === ship.length-1) directionClass = 'end'

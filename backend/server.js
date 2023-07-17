@@ -2,13 +2,17 @@ const express = require('express')
 const path = require('path')
 const http = require('http')
 const socketio = require('socket.io')
+const cors = require('cors')
 
 const app = express()
 const port = process.env.PORT | 3000
 const server = http.createServer(app)
 const io = socketio(server)
 
-app.use(express.static('public'))
+// app.use(express.static('public'))
+app.use(cors({
+  origin: ["*"]
+}))
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
