@@ -1,11 +1,16 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { io } from 'socket.io-client'
 import { useSearchParams, useRouter } from 'next/navigation'
+import updateWin from "@/firebase/functions/updatewin"
+import updateLose from "@/firebase/functions/updateLose"
+import { AuthContext } from "@/context/AuthContext"
+
 
 export default function Multiplayer() {
   const [room, setRoom] = useState()
+  const {user, setUser} = useContext(AuthContext)
   const router = useRouter()
   let computerSquares = []
   let userSquares = []
@@ -17,10 +22,6 @@ export default function Multiplayer() {
   let playerTurn
   const width = 10
   let isGameOver = false
-  let playerHits = []
-  let computerHits = []
-  let playerSunkShips = []
-  let computerSunkShips = []
   let cpuDestroyerCount = 0
   let cpuSubmarineCount = 0
   let cpuCruiserCount = 0
@@ -38,7 +39,9 @@ export default function Multiplayer() {
   // setRoom(searchParams)
   
   
-  useEffect(() => {
+  useEffect(async () => {
+    // updateWin(user['result'].id, user['result'].wins)
+    // updateLose(user['result'].id, user['result'].loses)
     const socket = io(`http://localhost:3000?room=${searchParams}`)
     const gamesBoardContainer = document.querySelector('#gamesboard-container')
     const optionContainer = document.querySelector('.option-container')
@@ -46,34 +49,6 @@ export default function Multiplayer() {
     const startButton = document.querySelector('#start-button')
     const turnDisplay = document.querySelector('#turn-display')
     const infoDisplay = document.querySelector('#info')
-
-    // const handleClick = (e) => {
-    //   if(!isGameOver){
-    //     if(e.target.classList.contains('taken')){
-    //       e.target.classList.add('boom')
-    //       infoDisplay.textContent = 'You hit computers ship'
-    //       let classes = Array.from(e.target.classList)
-    //       classes = classes.filter(className => className !== 'block')
-    //       classes = classes.filter(className => className !== 'boom')
-    //       classes = classes.filter(className => className !== 'taken')
-    //       playerHits.push(...classes)
-    //       checkScore('player', playerHits, playerSunkShips)
-    //     }
-    //     if(!e.target.classList.contains('taken')){
-    //       infoDisplay.textContent = 'Nothing hit'
-    //       e.target.classList.add('empty')
-    //     }
-    //     playerTurn = false
-    //     const allBoardBlocks = document.querySelectorAll('#computer div')
-    //     allBoardBlocks.forEach(block => block.replaceWith(block.cloneNode(true)))
-    //     setTimeout(enemyGo, 1000)
-    //   }
-    // }
-
-    // startButton.addEventListener('click', () => {
-    //   flipButton.replaceWith(flipButton.cloneNode(true))
-    //   startGameMulti(socket)
-    // })
 
     const createBoard = (user) => {
       const gameBoardContainer = document.createElement('div')
@@ -273,7 +248,7 @@ export default function Multiplayer() {
         turnDisplay.innerHTML = 'Your Go'
       }
   
-      function checkForWins() {
+      async function checkForWins() {
         let enemy = 'enemy'
         if (destroyerCount === 2) {
           infoDisplay.innerHTML = `You sunk the ${enemy}'s destroyer`
@@ -318,10 +293,12 @@ export default function Multiplayer() {
   
         if ((destroyerCount + submarineCount + cruiserCount + battleshipCount + carrierCount) === 50) {
           infoDisplay.innerHTML = "YOU WIN"
+          if(user)  updateWin(user['result'].id, user['result'].wins)
           gameOver()
         }
         if ((cpuDestroyerCount + cpuSubmarineCount + cpuCruiserCount + cpuBattleshipCount + cpuCarrierCount) === 50) {
           infoDisplay.innerHTML = `${enemy.toUpperCase()} WINS`
+          if(user)  updateLose(user['result'].id, user['result'].loses)
           gameOver()
         }
       }

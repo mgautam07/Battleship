@@ -7,12 +7,15 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT | 3000
 const server = http.createServer(app)
-const io = socketio(server)
+const io = socketio(server, {
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"]
+  }
+})
 
 // app.use(express.static('public'))
-app.use(cors({
-  origin: ["*"]
-}))
+app.use(cors())
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
@@ -32,9 +35,9 @@ io.on('connection', socket => {
   //   }
   // }
   socket.emit('player-number', playerIndex)
+  playerIndex++
   console.log(`Player ${playerIndex} has connected`)
   //ignoring player 3
-  playerIndex++
   if(playerIndex === -1)  return
 
   connections[playerIndex] = false
