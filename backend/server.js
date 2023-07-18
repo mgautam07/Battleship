@@ -19,31 +19,35 @@ app.use(cors({
 // })
 //socket work
 let connections = [null, null]
+let playerIndex = 0
 io.on('connection', socket => {
-  let playerIndex = -1
-  for(const i in connections){
-    if(connections[i] === null){
-      playerIndex = i
-      break
-    }
-  }
+  const roomId = socket.handshake.query.room
+  console.log(roomId)
+  socket.join(roomId)
+  
+  // for(const i in connections){
+  //   if(connections[i] === null){
+  //     playerIndex = i
+  //     break
+  //   }
+  // }
   socket.emit('player-number', playerIndex)
-
   console.log(`Player ${playerIndex} has connected`)
   //ignoring player 3
+  playerIndex++
   if(playerIndex === -1)  return
 
   connections[playerIndex] = false
 
-  socket.broadcast.emit('player-connection', playerIndex)
+  socket.to(roomId).emit('player-connection', playerIndex)
   socket.on('disconnect', () => {
     console.log(`Player ${playerIndex} disconnected`)
     connections[playerIndex] = null
-    socket.broadcast.emit('player-connection', playerIndex)
+    socket.to(roomId).emit('player-connection', playerIndex)
   })
 
   socket.on('player-ready', () => {
-    socket.broadcast.emit('enemy-ready', playerIndex)
+    socket.to(roomId).emit('enemy-ready', playerIndex)
     connections[playerIndex] = true
   })
 
@@ -56,12 +60,12 @@ io.on('connection', socket => {
 
   socket.on('fire', id => {
     console.log(`Shot fired from ${playerIndex}`, id)
-    socket.broadcast.emit('fire', id)
+    socket.to(roomId).emit('fire', id)
   })
 
   socket.on('fire-reply', square =>{
     console.log('fire-reply', square)
-    socket.broadcast.emit('fire-reply', square)
+    socket.to(roomId).emit('fire-reply', square)
   })
 
   setTimeout(() => {

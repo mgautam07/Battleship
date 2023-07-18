@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { io } from 'socket.io-client'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export default function Multiplayer() {
-  
+  const [room, setRoom] = useState()
+  const router = useRouter()
   let computerSquares = []
   let userSquares = []
   let currentPlayer = 'user'
@@ -30,8 +32,14 @@ export default function Multiplayer() {
   let battleshipCount = 0
   let carrierCount = 0
 
+  const searchParams = useSearchParams().get('room')
+  
+  // console.log(searchParams)
+  // setRoom(searchParams)
+  
+  
   useEffect(() => {
-    const socket = io("http://localhost:3000")
+    const socket = io(`http://localhost:3000?room=${searchParams}`)
     const gamesBoardContainer = document.querySelector('#gamesboard-container')
     const optionContainer = document.querySelector('.option-container')
     const flipButton = document.querySelector('#flip-button')
@@ -39,28 +47,28 @@ export default function Multiplayer() {
     const turnDisplay = document.querySelector('#turn-display')
     const infoDisplay = document.querySelector('#info')
 
-    const handleClick = (e) => {
-      if(!isGameOver){
-        if(e.target.classList.contains('taken')){
-          e.target.classList.add('boom')
-          infoDisplay.textContent = 'You hit computers ship'
-          let classes = Array.from(e.target.classList)
-          classes = classes.filter(className => className !== 'block')
-          classes = classes.filter(className => className !== 'boom')
-          classes = classes.filter(className => className !== 'taken')
-          playerHits.push(...classes)
-          checkScore('player', playerHits, playerSunkShips)
-        }
-        if(!e.target.classList.contains('taken')){
-          infoDisplay.textContent = 'Nothing hit'
-          e.target.classList.add('empty')
-        }
-        playerTurn = false
-        const allBoardBlocks = document.querySelectorAll('#computer div')
-        allBoardBlocks.forEach(block => block.replaceWith(block.cloneNode(true)))
-        setTimeout(enemyGo, 1000)
-      }
-    }
+    // const handleClick = (e) => {
+    //   if(!isGameOver){
+    //     if(e.target.classList.contains('taken')){
+    //       e.target.classList.add('boom')
+    //       infoDisplay.textContent = 'You hit computers ship'
+    //       let classes = Array.from(e.target.classList)
+    //       classes = classes.filter(className => className !== 'block')
+    //       classes = classes.filter(className => className !== 'boom')
+    //       classes = classes.filter(className => className !== 'taken')
+    //       playerHits.push(...classes)
+    //       checkScore('player', playerHits, playerSunkShips)
+    //     }
+    //     if(!e.target.classList.contains('taken')){
+    //       infoDisplay.textContent = 'Nothing hit'
+    //       e.target.classList.add('empty')
+    //     }
+    //     playerTurn = false
+    //     const allBoardBlocks = document.querySelectorAll('#computer div')
+    //     allBoardBlocks.forEach(block => block.replaceWith(block.cloneNode(true)))
+    //     setTimeout(enemyGo, 1000)
+    //   }
+    // }
 
     // startButton.addEventListener('click', () => {
     //   flipButton.replaceWith(flipButton.cloneNode(true))
@@ -193,7 +201,7 @@ export default function Multiplayer() {
     addPlayerShipPiece(carrier)
 
     const playerReady = (num) => {
-      let player = `.p${parseInt(num)+1}`
+      let player = `.p${(parseInt(num)%2)+1}`
       document.querySelector(`${player} .ready`).classList.toggle('active')
     }
 
@@ -331,6 +339,7 @@ export default function Multiplayer() {
       socket.on('player-number', num => {
         if(num === -1){
           infoDisplay.textContent = "Server full"
+          router.replace('/')
         }
         else{
           playerNum = parseInt(num)
@@ -340,7 +349,7 @@ export default function Multiplayer() {
       })
   
       socket.on('player-connection', num => {
-        console.log(`Player number ${num} has disconnected or connected`)
+        // console.log(`Player number ${num} has disconnected or connected`)
         playerConnectedOrDisconnected(num)
       })
   
@@ -383,7 +392,9 @@ export default function Multiplayer() {
       })
   
       function playerConnectedOrDisconnected(num) {
-        let player = `.p${parseInt(num) + 1}`
+        let player = `.p${(parseInt(num)%2) +1}`
+        // console.log(player)
+        // console.log(document.querySelector(`${player} .connected`))
         document.querySelector(`${player} .connected`).classList.toggle('active')
         if(parseInt(num) === playerNum)
           document.querySelector(player).style.fontWeight = 'bold'
