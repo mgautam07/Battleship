@@ -9,7 +9,7 @@ const port = process.env.PORT | 3000
 const server = http.createServer(app)
 const io = socketio(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: ["http://localhost:3001", "https://battleship1.netlify.app"],
     methods: ["GET", "POST"]
   }
 })
