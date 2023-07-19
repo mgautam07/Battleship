@@ -35,7 +35,6 @@ export default function Singleplayer() {
           classes = classes.filter(className => className !== 'block')
           classes = classes.filter(className => className !== 'boom')
           classes = classes.filter(className => className !== 'taken')
-          console.log('first', classes)
           playerHits.push(...classes)
           checkScore('player', playerHits, playerSunkShips)
         }
@@ -121,7 +120,6 @@ export default function Singleplayer() {
     const startGameSingle = () => {
       if (playerTurn === undefined) {
         const allBoardBlocks = document.querySelectorAll('#computer div')
-        console.log(allBoardBlocks)
         allBoardBlocks.forEach(block => block.addEventListener('click', handleClick))
         playerTurn = true
         turnDisplay.textContent = 'Your turn'
@@ -182,7 +180,6 @@ export default function Singleplayer() {
         shipBlock.classList.add(directionClass)
         shipBlock.classList.add(ship.name)
         shipBlock.classList.add('taken')
-        console.log(directionClass)
         if(isHorizontal)  shipBlock.classList.add('horizontal')
         else  shipBlock.classList.add('vertical')
       })
