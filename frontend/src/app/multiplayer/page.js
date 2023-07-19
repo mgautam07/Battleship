@@ -3,7 +3,7 @@
 import { useEffect, useState, useContext } from "react"
 import { io } from 'socket.io-client'
 import { useSearchParams, useRouter } from 'next/navigation'
-import updateWin from "@/firebase/functions/updatewin"
+import updateWin from "@/firebase/functions/updateWin"
 import updateLose from "@/firebase/functions/updateLose"
 import { AuthContext } from "@/context/AuthContext"
 
