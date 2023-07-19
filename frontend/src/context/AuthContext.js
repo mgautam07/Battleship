@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth'
 import { auth } from '@/firebase/config'
 import getUserData from '@/firebase/functions/getUserData'
+import Image from 'next/image'
 
 // const auth = getAuth(app)
 
@@ -37,7 +38,10 @@ export const AuthContextProvider = ({
 
     return (
         <AuthContext.Provider value={{ user }}>
-            {loading ? <div>Loading...</div> : children}
+            {loading ? 
+                <div className="flex align-middle justify-center">
+                    <Image src="fingerprint-blue.svg" alt="Loading" height="300" width="300" className="w-screen h-screen" />
+                </div> : children}
         </AuthContext.Provider>
     )
 }
