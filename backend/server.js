@@ -25,7 +25,12 @@ let connections = [null, null]
 let playerIndex = 0
 io.on('connection', socket => {
   const roomId = socket.handshake.query.room
-  console.log(roomId)
+  if((io.sockets.adapter.rooms.get(roomId) && io.sockets.adapter.rooms.get(roomId).size === 2))
+  {
+    socket.emit('player-number', -1)
+    // socket.leave(roomId)
+    return
+  }
   socket.join(roomId)
   
   // for(const i in connections){

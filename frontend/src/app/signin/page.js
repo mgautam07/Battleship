@@ -22,7 +22,7 @@ export default function SignIn() {
 
         // else successful
         console.log(result)
-        return router.push("/")
+        return router.push("/play")
     }
   return (
     <section>

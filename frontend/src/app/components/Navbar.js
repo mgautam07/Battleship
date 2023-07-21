@@ -1,14 +1,17 @@
 'use client'
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { AuthContext } from "@/context/AuthContext"
+import { getAuth, signOut } from "firebase/auth"
+import { User } from "lucide-react"
 
 const menuItems = [
   {
     name: 'Play',
-    href: '/',
+    href: '/play',
   },
   {
     name: 'Leaderboard',
@@ -18,19 +21,29 @@ const menuItems = [
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
-
+  const {user, setUser} = useContext(AuthContext)
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
+
+  const auth = getAuth()
+  const sout = () => {
+    signOut(auth).then(() => {
+      console.log('first')
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+ 
 
   return (
     <div className="relative w-full bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         <div className="inline-flex items-center space-x-2">
-          <span>
-            <Image src="/bs.png"alt="bs" width="25" height="25"/>
-          </span>
-            <Image src="icon2.svg" alt="battleship logo" width="70" height="80" />
+          <Link href="/" className='flex'>
+            <Image className="mr-3" src="/bs.png"alt="bs" width="25" height="25"/>
+            <Image src="icon2.svg" alt="battleship logo" width="90" height="100" />
+          </Link>
         </div>
         <div className="hidden lg:block">
           <ul className="inline-flex space-x-8">
@@ -46,7 +59,7 @@ export default function Navbar() {
             ))}
           </ul>
         </div>
-        <div className="hidden space-x-2 lg:block">
+        { !user ? (<div className="hidden space-x-2 lg:block">
           <Link href='/signup'>
             <button
               type="button"
@@ -63,8 +76,24 @@ export default function Navbar() {
               Sign In
             </button>
           </Link>
-          
-        </div>
+        </div>) : (
+          <div className="hidden space-x-2 lg:flex lg:justify-center lg:align-middle">
+            {/* <div className="flex items-center space-x-2"> */}
+              <User />
+                <span className="text-sm font-medium text-gray-900">{user.result.username}</span>
+            {/* </div> */}
+            <Link href='/play'>
+                <button
+                  type="button"
+                  onClick={sout}
+                  className="rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                >
+                  Sign Out
+                </button>
+              </Link>
+            </div>
+          ) 
+        }
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
         </div>
