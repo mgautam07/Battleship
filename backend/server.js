@@ -41,7 +41,8 @@ io.on('connection', socket => {
   if(playerIndex === -1)  return
 
   connections[playerIndex] = false
-
+  if(io.sockets.adapter.rooms.get(roomId).size === 2) socket.to(roomId).emit('enemy-connected')
+  
   socket.to(roomId).emit('player-connection', playerIndex)
   socket.on('disconnect', () => {
     console.log(`Player ${playerIndex} disconnected`)
@@ -49,17 +50,21 @@ io.on('connection', socket => {
     socket.to(roomId).emit('player-connection', playerIndex)
   })
 
-  socket.on('player-ready', () => {
-    socket.to(roomId).emit('enemy-ready', playerIndex)
-    connections[playerIndex] = true
+  socket.on('enemy-connected', () => {
+    socket.to(roomId).emit('enemy-connected')
   })
 
-  socket.on('check-players', () => {
-    const players = []
-    for(const i in connections)
-      connections[i] === null ? players.push({connected: false, ready: false}) : players.push({connected: true, ready: connections[i]})
-    socket.emit('check-players', players)
+  socket.on('player-ready', () => {
+    socket.to(roomId).emit('enemy-ready')
+    // connections[playerIndex] = true
   })
+
+  // socket.on('check-players', () => {
+  //   const players = []
+  //   for(const i in connections)
+  //     connections[i] === null ? players.push({connected: false, ready: false}) : players.push({connected: true, ready: connections[i]})
+  //   socket.emit('check-players', players)
+  // })
 
   socket.on('fire', id => {
     console.log(`Shot fired from ${playerIndex}`, id)

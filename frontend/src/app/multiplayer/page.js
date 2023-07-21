@@ -39,9 +39,10 @@ export default function Multiplayer() {
   // setRoom(searchParams)
   
   
-  useEffect(async () => {
+  useEffect(() => {
     // updateWin(user['result'].id, user['result'].wins)
     // updateLose(user['result'].id, user['result'].loses)
+    // const socket = io(`https://battleship-fnn4.onrender.com?room=${searchParams}`)
     const socket = io(`http://localhost:3000?room=${searchParams}`)
     const gamesBoardContainer = document.querySelector('#gamesboard-container')
     const optionContainer = document.querySelector('.option-container')
@@ -186,7 +187,8 @@ export default function Multiplayer() {
       if(!ready){
         socket.emit('player-ready')
         ready = true
-        playerReady(playerNum)
+        // playerReady(playerNum)
+        document.querySelector(`.p1 .ready`).classList.add('active')
       }
       if(enemyReady)
       {
@@ -320,7 +322,7 @@ export default function Multiplayer() {
         }
         else{
           playerNum = parseInt(num)
-          if(playerNum === 1) currentPlayer = "enemy"
+          if((playerNum%2) === 1) currentPlayer = "enemy"
           socket.emit('check-players')
         }
       })
@@ -330,22 +332,35 @@ export default function Multiplayer() {
         playerConnectedOrDisconnected(num)
       })
   
-      socket.on('enemy-ready', num => {
+      socket.on('enemy-ready', () => {
         enemyReady = true
-        playerReady(num)
+        // playerReady(num)
+        document.querySelector(`.p2 .ready`).classList.add('active')
         if(ready) startGameMulti(socket)
       })
   
-      socket.on('check-players', players => {
-        players.forEach((p, i) => {
-          if(p.connected) playerConnectedOrDisconnected(i)
-          if(p.ready){
-            playerReady(i)
-            if(i !== playerNum) enemyReady = true
-          }
-        })
+      // socket.on('check-players', players => {
+        // players.forEach((p, i) => {
+        //   if(p.connected) playerConnectedOrDisconnected(i)
+        //   if(p.ready){
+        //     playerReady(i)
+        //     if(i !== playerNum) enemyReady = true
+        //   }
+        // })
+      // })
+      
+      socket.on('enemy-connected', () => {
+        const enem = document.querySelector(`.p2 .connected`)
+        if(!enem.classList.contains('active')){
+          enem.classList.add('active')
+          socket.emit('enemy-connected')
+        }
+        if(document.querySelector('.p1 .ready').classList.contains('active'))
+        {
+          socket.emit('player-ready')
+        }
       })
-  
+
       // On fire receive
       socket.on('fire', id => {
         enemyGo(id)
@@ -372,12 +387,12 @@ export default function Multiplayer() {
         let player = `.p${(parseInt(num)%2) +1}`
         // console.log(player)
         // console.log(document.querySelector(`${player} .connected`))
-        document.querySelector(`${player} .connected`).classList.toggle('active')
+        // document.querySelector(`${player} .connected`).classList.toggle('active')
         if(parseInt(num) === playerNum)
           document.querySelector(player).style.fontWeight = 'bold'
       }
     }
-
+    document.querySelector(`.p1 .connected`).classList.add('active')
     startMultiPlayer()
   }, [])
 
@@ -386,12 +401,12 @@ export default function Multiplayer() {
     <>
       <div className="container">
         <div className="player p1">
-          Player 1
+          You
           <div className="connected">Connected</div>
           <div className="ready">Ready</div>
         </div>
         <div className="player p2">
-          Player 2
+          Enemy
           <div className="connected">Connected</div>
           <div className="ready">Ready</div>
         </div>
