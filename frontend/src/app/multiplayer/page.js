@@ -42,8 +42,8 @@ export default function Multiplayer() {
   useEffect(() => {
     // updateWin(user['result'].id, user['result'].wins)
     // updateLose(user['result'].id, user['result'].loses)
-    // const socket = io(`https://battleship-fnn4.onrender.com?room=${searchParams}`)
-    const socket = io(`http://localhost:3000?room=${searchParams}`)
+    const socket = io(`https://battleship-fnn4.onrender.com?room=${searchParams}`)
+    // const socket = io(`http://localhost:3000?room=${searchParams}`)
     const gamesBoardContainer = document.querySelector('#gamesboard-container')
     const optionContainer = document.querySelector('.option-container')
     const flipButton = document.querySelector('#flip-button')
