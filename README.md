@@ -17,11 +17,11 @@ It is played on ruled grids (paper or board) on which each player's fleet of war
 
 ### Features
 1. Singleplayer mode
-  <img src="screenshots/singleplayer.png" height=500/>
+  <img src="screenshots/singlepayer.png" height=500/>
 2. Multiplayer mode
   <img src="screenshots/multiplayer.png" height=500/>
 3. Authorization by Firebase
-   <img src="screenshots/signing.png" height=500/>
+   <img src="screenshots/signin.png" height=500/>
 4. Realtime Leaderboard
 
 
